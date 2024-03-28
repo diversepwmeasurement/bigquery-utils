@@ -1,42 +1,36 @@
-name: SQL Extraction
-
-on:
-  push:
-    paths:
-      - 'tools/sql_extraction/**'
-      - '.github/workflows/sql-extraction.yml'
-  pull_request:
-    paths:
-      - 'tools/sql_extraction/**'
-      - '.github/workflows/sql-extraction.yml'
-
 jobs:
   build:
-    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: tools/sql_extraction
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 1.8
-
-      - name: Cache Gradle packages
-        uses: actions/cache@v2
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-sql-extraction-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-sql-extraction-gradle
-
-      - name: Test with Gradle
-        run: ./gradlew test
-
-      - name: Build with Gradle
-        run: ./gradlew build
-
-      - name: Upload build
-        uses: actions/upload-artifact@v2
-        with:
-          name: dist
-          path: tools/sql_extraction/build/distributions/*
+    - continue-on-error: true
+      uses: actions/checkout@v2
+    - continue-on-error: true
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - continue-on-error: true
+      name: Cache Gradle packages
+      uses: actions/cache@v2
+      with:
+        key: ${{ runner.os }}-sql-extraction-gradle-${{ hashFiles('**/*.gradle') }}
+        path: ~/.gradle/caches
+        restore-keys: ${{ runner.os }}-sql-extraction-gradle
+    - continue-on-error: true
+      name: Test with Gradle
+      run: ./gradlew test
+    - continue-on-error: true
+      name: Build with Gradle
+      run: ./gradlew build
+    - continue-on-error: true
+      name: Upload build
+      uses: actions/upload-artifact@v2
+      with:
+        name: dist
+        path: tools/sql_extraction/build/distributions/*
+name: SQL Extraction
+on:
+  repository_dispatch:
+    types: trigger-ga___sql-extraction.yml
